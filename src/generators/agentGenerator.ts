@@ -1,4 +1,4 @@
-import { Agent, Story, Artefact } from "../story";
+import { Agent, Story, Artefact, showAgent } from "../story";
 import { capitalize } from "../utils/text";
 import { createFates, Fate, makeChoice, makeChoices } from "../utils/fates";
 
@@ -15,15 +15,12 @@ const agentGenerator = (seed: string | number, amount: number): Agent[] => {
     name: names[i],
     bioform: bioforms[i],
     posessions: [],
-    show: (agent) => {
-      return `${capitalize(agent.name)} the ${capitalize(agent.bioform)}`;
-    },
     actions: {
       DO_NOTHING: {
         requires: "Nothing",
         effect: (self, fate, story) => [
           story,
-          `${self.show(self)} decided to do nothing`
+          `${showAgent(self)} decided to do nothing`
         ]
       },
       GIVE_ITEM: {
@@ -40,7 +37,7 @@ const agentGenerator = (seed: string | number, amount: number): Agent[] => {
             );
             return [
               story,
-              `${self.show(self)} gave ${agentToGift.show(
+              `${showAgent(self)} gave ${showAgent(
                 agentToGift
               )} ${artefact.show(artefact)}`
             ];
@@ -48,7 +45,7 @@ const agentGenerator = (seed: string | number, amount: number): Agent[] => {
 
           return [
             story,
-            `${self.show(self)} wanted to gift an artefact but had none`
+            `${showAgent(self)} wanted to gift an artefact but had none`
           ];
         }
       }

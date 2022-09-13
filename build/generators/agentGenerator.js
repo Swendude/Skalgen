@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const text_1 = require("../utils/text");
+const story_1 = require("../story");
 const fates_1 = require("../utils/fates");
 const _names = ["roger", "bill", "joe", "gina", "leslie", "amalia"];
 const _bioforms = ["bunny", "raccoon", "mouse", "badger"];
@@ -12,15 +12,12 @@ const agentGenerator = (seed, amount) => {
         name: names[i],
         bioform: bioforms[i],
         posessions: [],
-        show: (agent) => {
-            return `${(0, text_1.capitalize)(agent.name)} the ${(0, text_1.capitalize)(agent.bioform)}`;
-        },
         actions: {
             DO_NOTHING: {
                 requires: "Nothing",
                 effect: (self, fate, story) => [
                     story,
-                    `${self.show(self)} decided to do nothing`
+                    `${(0, story_1.showAgent)(self)} decided to do nothing`
                 ]
             },
             GIVE_ITEM: {
@@ -34,12 +31,12 @@ const agentGenerator = (seed, amount) => {
                         self.posessions = self.posessions.filter((p, i) => i !== artefactChoice);
                         return [
                             story,
-                            `${self.show(self)} gave ${agentToGift.show(agentToGift)} ${artefact.show(artefact)}`
+                            `${(0, story_1.showAgent)(self)} gave ${(0, story_1.showAgent)(agentToGift)} ${artefact.show(artefact)}`
                         ];
                     }
                     return [
                         story,
-                        `${self.show(self)} wanted to gift an artefact but had none`
+                        `${(0, story_1.showAgent)(self)} wanted to gift an artefact but had none`
                     ];
                 }
             }
