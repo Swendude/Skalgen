@@ -5,7 +5,7 @@ const fates_1 = require("../utils/fates");
 exports.doNothing = {
     name: "do_nothing",
     checker: (storyPoint) => true,
-    effect: (now, agent, seed) => {
+    effect: (seed, now, agent) => {
         return [
             Object.assign({}, now),
             `${agent.name} did nothing.`
@@ -15,7 +15,7 @@ exports.doNothing = {
 exports.findArtefact = {
     name: "find_artefact",
     checker: (storyPoint) => storyPoint.artefacts.length > 0,
-    effect: (now, agent, seed) => {
+    effect: (seed, now, agent) => {
         const fate = (0, fates_1.createFates)(seed);
         const artefact = (0, fates_1.makeChoice)(fate, now.artefacts);
         return [

@@ -1,28 +1,26 @@
 import { Agent } from "../skalgen";
-import { capitalize } from "../utils/text";
+import fs from "fs";
 import { createFates, Fate, makeChoice, makeChoices } from "../utils/fates";
-
+import _firstNames from "./seeds/firstnames.json";
+import _surNames from "./seeds/surnames.json";
+import _titles from "./seeds/jobnames.json";
 const _face = ["😈", "🧝‍♀️", "🧝‍♂️", "🧙‍♂️", "👨‍🎨", "🧑‍🌾", "🧑‍🍳", "👩‍🎨", "🧑‍⚖️"];
-const _names = ["roger", "bill", "joe", "gina", "leslie", "amalia"];
-const _titles = [
-  "swordmaster",
-  "the bladesmith",
-  "the cobbler",
-  "the wise",
-  "the blind",
-  "the mad",
-  "the wicked",
-  "the ruler"
-];
 
 const agentGenerator = (seed: number): Agent => {
   let fate = createFates(seed);
   return {
-    name: `${makeChoice(fate, _face)} ${makeChoice(fate, _names)} ${makeChoice(
+    id: fate(),
+    name: `${makeChoice(fate, _face)} ${makeChoice(
       fate,
-      _titles
-    )}`,
-    inventory: []
+      _firstNames
+    )} ${makeChoice(fate, _surNames)} the ${makeChoice(fate, _titles)}`,
+    inventory: [],
+    dead: false,
+    resources: {
+      knowledge: 0,
+      influence: 0,
+      might: 0
+    }
   };
 };
 export default agentGenerator;

@@ -5,9 +5,10 @@ type generator<T> = (seed: number) => T;
 export type Story = {
   storyPoints: [StoryPoint, string][];
   fate: Fate;
-  actions: Action[];
+  actions: AgentAction[];
   agentGen: generator<Agent>;
   artefactGen: generator<Artefact>;
+  seed: number;
 };
 
 export type StoryPoint = {
@@ -17,30 +18,53 @@ export type StoryPoint = {
 };
 
 type attitudeVal = -3 | -2 | -1 | 0 | 1 | 2 | 3;
-type resourceVal = 0 | 1 | 2;
-type resourceT = "knowledge" | "influence" | "might";
+export type ResourceVal = 0 | 1 | 2;
+export type ResourceT = "knowledge" | "influence" | "might";
 
 export type Agent = {
+  id: number;
   name: string;
   inventory: Artefact[];
+  dead: boolean;
   //   attitudes: { [key: string]: attitudeVal };
-  //   resources: { [key in resourceT]: resourceVal };
+  resources: { [key in ResourceT]: ResourceVal };
 };
 
 export type Artefact = {
+  id: number;
   name: string;
+  usage: Usage;
 };
 
-type Effect = (
+type Usage = {
+  knowledge_requirement: ResourceVal;
+  action: ArtefactAction;
+};
+
+type AgentEffect = (
+  seed: number,
+  now: StoryPoint,
+  agent: Agent
+) => [StoryPoint, string];
+
+type ArtefactEffect = (
+  seed: number,
   now: StoryPoint,
   agent: Agent,
-  seed: number
+  artefact: Artefact
 ) => [StoryPoint, string];
 
 // type Stepper = (now: StoryPoint, effects: Effect[]) => StoryPoint;
 
-export type Action = {
+export type AgentAction = {
   name: string;
-  checker: (s: StoryPoint) => boolean;
-  effect: Effect;
+  checker: (s: StoryPoint, agent: Agent) => boolean;
+  effect: AgentEffect;
+};
+
+export type ArtefactAction = {
+  name: string;
+  checker: (s: StoryPoint, agent: Agent, artefact: Artefact) => boolean;
+  effect: ArtefactEffect;
+  postfix: string;
 };

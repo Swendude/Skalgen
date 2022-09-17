@@ -6,16 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const agentGenerator_1 = __importDefault(require("./generators/agentGenerator"));
 const artefactGenerator_1 = __importDefault(require("./generators/artefactGenerator"));
 const fates_1 = require("./utils/fates");
-const actions_1 = require("./actions");
+const agentActions_1 = require("./actions/agentActions");
 const text_1 = require("./utils/text");
 const prompts_1 = __importDefault(require("prompts"));
 const kleur_1 = __importDefault(require("kleur"));
+const seed = parseInt(process.argv[2]) || Math.floor(Math.random() * 1000000);
 const initialStory = {
     storyPoints: [],
     agentGen: agentGenerator_1.default,
     artefactGen: artefactGenerator_1.default,
-    fate: (0, fates_1.createFates)(Math.random() * 1000),
-    actions: [actions_1.doNothing, actions_1.findArtefact]
+    fate: (0, fates_1.createFates)(seed),
+    seed: seed,
+    actions: [agentActions_1.doNothing, agentActions_1.findArtefact, agentActions_1.useArtefact, agentActions_1.study]
 };
 const bigBang = (s) => {
     const newStoryPoint = {
@@ -28,19 +30,31 @@ const bigBang = (s) => {
 const tick = (s) => {
     const [currentPoint, currentLog] = s.storyPoints[s.storyPoints.length - 1];
     // pick an agent
-    const chosenAgent = (0, fates_1.makeChoice)(s.fate, currentPoint.agents);
-    // pick an action
-    const chosenAction = (0, fates_1.makeChoice)(s.fate, s.actions);
-    if (chosenAction.checker(currentPoint)) {
+    const agentsAlive = currentPoint.agents.filter((agent) => !agent.dead);
+    if (agentsAlive.length === 0) {
         return Object.assign(Object.assign({}, s), { storyPoints: [
                 ...s.storyPoints,
-                chosenAction.effect(currentPoint, chosenAgent, s.fate())
+                [Object.assign({}, currentPoint), "A barren wasteland"]
+            ] });
+    }
+    const currentAgentIndex = (s.storyPoints.length - 1) % agentsAlive.length;
+    const chosenAgent = currentPoint.agents[currentAgentIndex];
+    // const chosenAgent = makeChoice(s.fate, agentsAlive);
+    // pick an action
+    const chosenAction = (0, fates_1.makeChoice)(s.fate, s.actions);
+    if (chosenAction.checker(currentPoint, chosenAgent)) {
+        return Object.assign(Object.assign({}, s), { storyPoints: [
+                ...s.storyPoints,
+                chosenAction.effect(s.fate(), currentPoint, chosenAgent)
             ] });
     }
     else {
         return Object.assign(Object.assign({}, s), { storyPoints: [
                 ...s.storyPoints,
-                [currentPoint, `${chosenAgent.name} could not take their action`]
+                [
+                    currentPoint,
+                    `${chosenAgent.name} could not take their action (wanted ${chosenAction.name})`
+                ]
             ] });
     }
 };
@@ -57,6 +71,7 @@ const run_cli = async () => {
             type: "select",
             choices: [
                 { title: "next", value: "next" },
+                { title: "log & exit", value: "log" },
                 { title: "exit", value: "exit" }
             ],
             onState: (state) => {
@@ -69,12 +84,22 @@ const run_cli = async () => {
             message: "SKALGEN: Select option ('next' or 'exit')"
         };
         const choice = await (0, prompts_1.default)(nextStep);
+        console.log(choice.next_step);
         switch (choice.next_step) {
             case "exit":
                 exited = true;
+                break;
             case "next":
                 last_message = "Tick returned";
                 currentStory = tick(currentStory);
+                break;
+            case "log": {
+                currentStory.storyPoints.forEach((sp, i) => {
+                    console.log(`${kleur_1.default.bgWhite().black(`${i}`)} ${sp[1]}`);
+                });
+                exited = true;
+                break;
+            }
         }
     }
 };
