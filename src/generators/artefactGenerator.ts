@@ -18,24 +18,24 @@ const _prefixs = [
   "Alchemic",
   "Mysterious"
 ];
-const _suffixs = [
-  "Dagger 🗡",
-  "Candle 🕯",
-  "Cauldron 🍯",
-  "Mantle 🧥",
-  "Banjo 🪕",
-  "Pickaxe ⛏",
-  "Wand 🪄",
-  "Mirror 🪞",
-  "Shoes 👞",
-  "Quill 🪶",
-  "Tablet 🪨",
-  "Sword 🗡",
-  "Amulet 🧿",
-  "Ring 💍",
-  "Egg 🥚",
-  "Scroll 📜",
-  "Tome 📖"
+const _names = [
+  ["Dagger", "🗡"],
+  ["Candle", "🕯"],
+  ["Cauldron", "🍯"],
+  ["Mantle", "🧥"],
+  ["Banjo", "🪕"],
+  ["Pickaxe", "⛏"],
+  ["Wand", "🪄"],
+  ["Mirror", "🪞"],
+  ["Shoes", "👞"],
+  ["Quill", "🪶"],
+  ["Tablet", "🪨"],
+  ["Sword", "🗡"],
+  ["Amulet", "🧿"],
+  ["Ring", "💍"],
+  ["Egg", "🥚"],
+  ["Scroll", "📜"],
+  ["Tome", "📖"]
 ];
 
 const actionOptions = [killOtherAgent, reviveOtherAgent, gainMight];
@@ -43,14 +43,16 @@ const actionOptions = [killOtherAgent, reviveOtherAgent, gainMight];
 const artefactGenerator = (seed: number): Artefact => {
   let fate = createFates(seed);
 
+  const chosenAction = makeChoice(fate, actionOptions);
   const pfixs = makeChoice(fate, _prefixs);
-  const sfixs = makeChoice(fate, _suffixs);
+  const [name, icon] = makeChoice(fate, _names);
+  const sfix = chosenAction.postfix;
   return {
     id: fate(),
-    name: `${pfixs} ${sfixs}`,
+    name: `${pfixs} ${name} ${sfix} ${icon}`,
     usage: {
       knowledge_requirement: fate(3) as ResourceVal,
-      action: makeChoice(fate, actionOptions)
+      action: chosenAction
     }
   };
 };

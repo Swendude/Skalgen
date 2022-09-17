@@ -21,8 +21,8 @@ const initialStory = {
 };
 const bigBang = (s) => {
     const newStoryPoint = {
-        agents: [...new Array(3)].map((i) => s.agentGen(s.fate())),
-        artefacts: [...new Array(6)].map((i) => s.artefactGen(s.fate())),
+        agents: [...new Array(6)].map((i) => s.agentGen(s.fate())),
+        artefacts: [...new Array(15)].map((i) => s.artefactGen(s.fate())),
         facts: []
     };
     return Object.assign(Object.assign({}, s), { storyPoints: [[newStoryPoint, "The world was created"]] });
@@ -41,22 +41,18 @@ const tick = (s) => {
     const chosenAgent = agentsAlive[currentAgentIndex];
     // const chosenAgent = makeChoice(s.fate, agentsAlive);
     // pick an action
-    const chosenAction = (0, fates_1.makeChoice)(s.fate, s.actions);
-    if (chosenAction.checker(currentPoint, chosenAgent)) {
+    const availableActions = s.actions.filter((_action) => _action.checker(currentPoint, chosenAgent));
+    if (availableActions.length === 0) {
         return Object.assign(Object.assign({}, s), { storyPoints: [
                 ...s.storyPoints,
-                chosenAction.effect(s.fate(), currentPoint, chosenAgent)
+                [currentPoint, `${(0, text_1.renderAgent)(chosenAgent)} could not take any action`]
             ] });
     }
-    else {
-        return Object.assign(Object.assign({}, s), { storyPoints: [
-                ...s.storyPoints,
-                [
-                    currentPoint,
-                    `${chosenAgent.name} could not take their action (wanted ${chosenAction.name})`
-                ]
-            ] });
-    }
+    const chosenAction = (0, fates_1.makeChoice)(s.fate, availableActions);
+    return Object.assign(Object.assign({}, s), { storyPoints: [
+            ...s.storyPoints,
+            chosenAction.effect(s.fate(), currentPoint, chosenAgent)
+        ] });
 };
 let currentStory = bigBang(initialStory);
 const run_cli = async () => {

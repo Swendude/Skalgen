@@ -10,7 +10,7 @@ import {
   train,
   useArtefact
 } from "./actions/agentActions";
-import { renderStory } from "./utils/text";
+import { renderAgent, renderStory } from "./utils/text";
 import prompts, { PromptObject } from "prompts";
 import kleur from "kleur";
 
@@ -26,8 +26,8 @@ const initialStory: Story = {
 
 const bigBang = (s: Story): Story => {
   const newStoryPoint: StoryPoint = {
-    agents: [...new Array(3)].map((i) => s.agentGen(s.fate())),
-    artefacts: [...new Array(6)].map((i) => s.artefactGen(s.fate())),
+    agents: [...new Array(6)].map((i) => s.agentGen(s.fate())),
+    artefacts: [...new Array(15)].map((i) => s.artefactGen(s.fate())),
     facts: []
   };
   return { ...s, storyPoints: [[newStoryPoint, "The world was created"]] };
@@ -52,27 +52,26 @@ const tick = (s: Story): Story => {
   // const chosenAgent = makeChoice(s.fate, agentsAlive);
 
   // pick an action
-  const chosenAction = makeChoice(s.fate, s.actions);
-  if (chosenAction.checker(currentPoint, chosenAgent)) {
+  const availableActions = s.actions.filter((_action) =>
+    _action.checker(currentPoint, chosenAgent)
+  );
+  if (availableActions.length === 0) {
     return {
       ...s,
       storyPoints: [
         ...s.storyPoints,
-        chosenAction.effect(s.fate(), currentPoint, chosenAgent)
-      ]
-    };
-  } else {
-    return {
-      ...s,
-      storyPoints: [
-        ...s.storyPoints,
-        [
-          currentPoint,
-          `${chosenAgent.name} could not take their action (wanted ${chosenAction.name})`
-        ]
+        [currentPoint, `${renderAgent(chosenAgent)} could not take any action`]
       ]
     };
   }
+  const chosenAction = makeChoice(s.fate, availableActions);
+  return {
+    ...s,
+    storyPoints: [
+      ...s.storyPoints,
+      chosenAction.effect(s.fate(), currentPoint, chosenAgent)
+    ]
+  };
 };
 
 let currentStory = bigBang(initialStory);

@@ -34,7 +34,7 @@ const renderStory = (s, point) => {
     console.log(kleur_1.default.red().underline(`----------------------------------`));
 };
 exports.renderStory = renderStory;
-const renderArtefact = (artefact) => `${kleur_1.default.blue().bold(`${artefact.name} ${artefact.usage.action.postfix}`)} (${artefact.usage.knowledge_requirement})`;
+const renderArtefact = (artefact) => `${kleur_1.default.blue().bold(`${artefact.name}`)} (${artefact.usage.knowledge_requirement})`;
 exports.renderArtefact = renderArtefact;
-const renderAgent = (agent) => `${kleur_1.default.green().bold(agent.name)}${agent.dead ? "☠️" : ""}`;
+const renderAgent = (agent) => `${kleur_1.default.green().bold(agent.name)} ${agent.dead ? "☠️" : ""}`;
 exports.renderAgent = renderAgent;

@@ -37,9 +37,9 @@ export const renderStory = (s: Story, point?: number): void => {
 };
 
 export const renderArtefact = (artefact: Artefact): string =>
-  `${kleur.blue().bold(`${artefact.name} ${artefact.usage.action.postfix}`)} (${
+  `${kleur.blue().bold(`${artefact.name}`)} (${
     artefact.usage.knowledge_requirement
   })`;
 
 export const renderAgent = (agent: Agent): string =>
-  `${kleur.green().bold(agent.name)}${agent.dead ? "☠️" : ""}`;
+  `${kleur.green().bold(agent.name)} ${agent.dead ? "☠️" : ""}`;

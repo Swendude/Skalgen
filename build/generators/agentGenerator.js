@@ -7,12 +7,11 @@ const fates_1 = require("../utils/fates");
 const firstnames_json_1 = __importDefault(require("./seeds/firstnames.json"));
 const surnames_json_1 = __importDefault(require("./seeds/surnames.json"));
 const jobnames_json_1 = __importDefault(require("./seeds/jobnames.json"));
-const _face = ["😈", "🧝‍♀️", "🧝‍♂️", "🧙‍♂️", "👨‍🎨", "🧑‍🌾", "🧑‍🍳", "👩‍🎨", "🧑‍⚖️"];
 const agentGenerator = (seed) => {
     let fate = (0, fates_1.createFates)(seed);
     return {
         id: fate(),
-        name: `${(0, fates_1.makeChoice)(fate, _face)} ${(0, fates_1.makeChoice)(fate, firstnames_json_1.default)} ${(0, fates_1.makeChoice)(fate, surnames_json_1.default)} the ${(0, fates_1.makeChoice)(fate, jobnames_json_1.default)}`,
+        name: `${(0, fates_1.makeChoice)(fate, firstnames_json_1.default)} ${(0, fates_1.makeChoice)(fate, surnames_json_1.default)} the ${(0, fates_1.makeChoice)(fate, jobnames_json_1.default)}`,
         inventory: [],
         dead: false,
         resources: {
