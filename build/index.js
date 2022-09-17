@@ -17,7 +17,7 @@ const initialStory = {
     artefactGen: artefactGenerator_1.default,
     fate: (0, fates_1.createFates)(seed),
     seed: seed,
-    actions: [agentActions_1.doNothing, agentActions_1.findArtefact, agentActions_1.useArtefact, agentActions_1.study]
+    actions: [agentActions_1.findArtefact, agentActions_1.useArtefact, agentActions_1.study, agentActions_1.politics, agentActions_1.train, agentActions_1.smear]
 };
 const bigBang = (s) => {
     const newStoryPoint = {

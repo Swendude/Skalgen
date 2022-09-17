@@ -6,6 +6,24 @@ import {
   ResourceT
 } from "../skalgen";
 
+export const killAgent = (s: StoryPoint, agent: Agent) => ({
+  ...s,
+  agents: s.agents.map((_agent) => {
+    if (agent.id === _agent.id) {
+      return { ...agent, dead: true };
+    } else return _agent;
+  })
+});
+
+export const reviveAgent = (s: StoryPoint, agent: Agent) => ({
+  ...s,
+  agents: s.agents.map((_agent) => {
+    if (agent.id === _agent.id) {
+      return { ...agent, dead: false };
+    } else return _agent;
+  })
+});
+
 export const changeAgentResource = (
   s: StoryPoint,
   agent: Agent,
@@ -15,12 +33,14 @@ export const changeAgentResource = (
   return {
     ...s,
     agents: s.agents.map((_agent) => {
+      const newResourceVal = _agent.resources[resource] + change;
       if (_agent.id === agent.id) {
         return {
           ..._agent,
           resources: {
             ..._agent.resources,
-            [resource]: _agent.resources[resource] + change
+            [resource]:
+              newResourceVal < 0 ? 0 : newResourceVal > 3 ? 3 : newResourceVal
           }
         };
       } else {

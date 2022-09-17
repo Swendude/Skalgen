@@ -12,8 +12,16 @@ exports.killOtherAgent = {
     effect: (seed, now, agent, artefact) => {
         const fate = (0, fates_1.createFates)(seed);
         const chosenTarget = (0, fates_1.makeChoice)(fate, now.agents.filter((_agent) => _agent.id !== agent.id && !_agent.dead));
+        const myRoll = fate(10) + agent.resources.might;
+        const theirRoll = fate(10) + agent.resources.might;
+        if (theirRoll > myRoll) {
+            return [
+                (0, manipulations_1.removeArtefactFromAgent)(now, agent, artefact),
+                `${(0, text_1.renderAgent)(agent)} failed to kill (${myRoll}-${theirRoll}) ${(0, text_1.renderAgent)(chosenTarget)}, destroyed ${(0, text_1.renderArtefact)(artefact)}!`
+            ];
+        }
         return [
-            Object.assign(Object.assign({}, now), { agents: now.agents.map((_agent) => _agent.id === chosenTarget.id ? Object.assign(Object.assign({}, _agent), { dead: true }) : _agent) }),
+            (0, manipulations_1.removeArtefactFromAgent)((0, manipulations_1.killAgent)(now, chosenTarget), agent, artefact),
             `${(0, text_1.renderAgent)(agent)} killed ${(0, text_1.renderAgent)(chosenTarget)} using ${(0, text_1.renderArtefact)(artefact)}!`
         ];
     }
@@ -45,7 +53,7 @@ exports.reviveOtherAgent = {
         const fate = (0, fates_1.createFates)(seed);
         const chosenTarget = (0, fates_1.makeChoice)(fate, now.agents.filter((_agent) => _agent.id !== agent.id && _agent.dead));
         return [
-            Object.assign(Object.assign({}, now), { agents: now.agents.map((_agent) => _agent.id === chosenTarget.id ? Object.assign(Object.assign({}, _agent), { dead: false }) : _agent) }),
+            (0, manipulations_1.removeArtefactFromAgent)((0, manipulations_1.reviveAgent)(now, chosenTarget), agent, artefact),
             `${(0, text_1.renderAgent)(agent)} revived ${(0, text_1.renderAgent)(chosenTarget)} using ${artefact.name}!`
         ];
     }

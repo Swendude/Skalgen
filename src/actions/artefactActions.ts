@@ -1,7 +1,13 @@
 import { ArtefactAction } from "../skalgen";
 import { createFates, makeChoice } from "../utils/fates";
 import { renderAgent, renderArtefact } from "../utils/text";
-import { changeAgentResource, removeArtefactFromAgent } from "../manipulations";
+import {
+  changeAgentResource,
+  killAgent,
+  removeArtefactFromAgent,
+  reviveAgent
+} from "../manipulations";
+
 export const killOtherAgent: ArtefactAction = {
   name: "kill_other_agent",
   postfix: "of Killing",
@@ -14,14 +20,21 @@ export const killOtherAgent: ArtefactAction = {
       fate,
       now.agents.filter((_agent) => _agent.id !== agent.id && !_agent.dead)
     );
+    const myRoll = fate(10) + agent.resources.might;
+    const theirRoll = fate(10) + agent.resources.might;
 
+    if (theirRoll > myRoll) {
+      return [
+        removeArtefactFromAgent(now, agent, artefact),
+        `${renderAgent(
+          agent
+        )} failed to kill (${myRoll}-${theirRoll}) ${renderAgent(
+          chosenTarget
+        )}, destroyed ${renderArtefact(artefact)}!`
+      ];
+    }
     return [
-      {
-        ...now,
-        agents: now.agents.map((_agent) =>
-          _agent.id === chosenTarget.id ? { ..._agent, dead: true } : _agent
-        )
-      },
+      removeArtefactFromAgent(killAgent(now, chosenTarget), agent, artefact),
       `${renderAgent(agent)} killed ${renderAgent(
         chosenTarget
       )} using ${renderArtefact(artefact)}!`
@@ -69,12 +82,7 @@ export const reviveOtherAgent: ArtefactAction = {
     );
 
     return [
-      {
-        ...now,
-        agents: now.agents.map((_agent) =>
-          _agent.id === chosenTarget.id ? { ..._agent, dead: false } : _agent
-        )
-      },
+      removeArtefactFromAgent(reviveAgent(now, chosenTarget), agent, artefact),
       `${renderAgent(agent)} revived ${renderAgent(chosenTarget)} using ${
         artefact.name
       }!`

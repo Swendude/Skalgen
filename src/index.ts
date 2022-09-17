@@ -3,9 +3,11 @@ import artefactGenerator from "./generators/artefactGenerator";
 import { Story, StoryPoint } from "./skalgen";
 import { createFates, makeChoice } from "./utils/fates";
 import {
-  doNothing,
   findArtefact,
+  politics,
+  smear,
   study,
+  train,
   useArtefact
 } from "./actions/agentActions";
 import { renderStory } from "./utils/text";
@@ -19,7 +21,7 @@ const initialStory: Story = {
   artefactGen: artefactGenerator,
   fate: createFates(seed),
   seed: seed,
-  actions: [doNothing, findArtefact, useArtefact, study]
+  actions: [findArtefact, useArtefact, study, politics, train, smear]
 };
 
 const bigBang = (s: Story): Story => {
