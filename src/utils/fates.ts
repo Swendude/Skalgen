@@ -3,7 +3,9 @@ import Rand from "rand-seed";
 export const createFates = (seed: number | string) => {
   const fate = new Rand(seed.toString());
   return (max?: number) => {
-    return Math.floor(fate.next() * (max || Number.MAX_VALUE)) + 1;
+    return (
+      Math.floor(fate.next() * (max !== undefined ? max : Number.MAX_VALUE)) + 1
+    );
   };
 };
 

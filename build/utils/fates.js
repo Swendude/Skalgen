@@ -8,7 +8,7 @@ const rand_seed_1 = __importDefault(require("rand-seed"));
 const createFates = (seed) => {
     const fate = new rand_seed_1.default(seed.toString());
     return (max) => {
-        return Math.floor(fate.next() * (max || Number.MAX_VALUE)) + 1;
+        return (Math.floor(fate.next() * (max !== undefined ? max : Number.MAX_VALUE)) + 1);
     };
 };
 exports.createFates = createFates;

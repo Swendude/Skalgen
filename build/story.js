@@ -1,14 +1,42 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.showAgent = exports.showStory = void 0;
-const text_1 = require("./utils/text");
-const showStory = (story) => {
-    const agents = story.agents.map((agent) => (0, exports.showAgent)(agent));
-    let result = `Agents:\t${agents.join(", ")}`;
-    return result;
-};
-exports.showStory = showStory;
-const showAgent = (agent) => {
-    return `${(0, text_1.capitalize)(agent.name)} the ${(0, text_1.capitalize)(agent.bioform)}`;
-};
-exports.showAgent = showAgent;
+// import Rand from "rand-seed";
+// import { Fate } from "./utils/fates";
+// import { capitalize } from "./utils/text";
+// export type entities = "Artefact_Other" | "Artefact_Self" | "Nothing" | "Agent";
+// export type Story = {
+//   agents: Agent[];
+//   locations: Location[];
+//   story_fate: Fate;
+// };
+// export const showStory = (story: Story) => {
+//   const agents = story.agents.map((agent) => showAgent(agent));
+//   let result = `Agents:\t${agents.join(", ")}`;
+//   return result;
+// };
+// export type Action<T> = {
+//   requires: entities;
+//   effect: (t: T, fate: Fate, story: Story) => [Story, string];
+// };
+// export type Agent = {
+//   name: string;
+//   bioform: string;
+//   posessions: Artefact[];
+//   actions: { [index: string]: Action<Agent> };
+// };
+// export const showAgent = (agent: Agent) => {
+//   return `${capitalize(agent.name)} the ${capitalize(agent.bioform)}`;
+// };
+// export type Location = {
+//   name: string;
+//   x: number;
+//   y: number;
+// };
+// export type Usage<T> = {
+//   requires: "Agent" | "Nothing";
+//   effect: (t: T, fate: Fate, story: Story) => Story;
+// };
+// export type Artefact = {
+//   name: string;
+//   show: (artefact: Artefact) => string;
+//   usage: { [index: string]: Usage<Artefact> };
+// };
