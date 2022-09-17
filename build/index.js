@@ -38,7 +38,7 @@ const tick = (s) => {
             ] });
     }
     const currentAgentIndex = (s.storyPoints.length - 1) % agentsAlive.length;
-    const chosenAgent = currentPoint.agents[currentAgentIndex];
+    const chosenAgent = agentsAlive[currentAgentIndex];
     // const chosenAgent = makeChoice(s.fate, agentsAlive);
     // pick an action
     const chosenAction = (0, fates_1.makeChoice)(s.fate, s.actions);
