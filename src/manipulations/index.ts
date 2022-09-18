@@ -74,8 +74,6 @@ const changeAgentResource =
 const removeArtefactFromAgent =
   (agent: Agent, artefact: Artefact) => (s: StoryPoint) => {
     const agentIx = findIndex(eqProps("id", agent), s.agents);
-    console.log(agentIx);
-    console.log(view(agentArtefactsLens(agentIx), s));
     return set(
       agentArtefactsLens(agentIx),
       filter(eqProps("id", artefact), view(agentArtefactsLens(agentIx), s)),
