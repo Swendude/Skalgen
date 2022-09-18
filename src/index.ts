@@ -8,7 +8,9 @@ import {
   smear,
   study,
   train,
-  useArtefact
+  useArtefact,
+  spy,
+  assault
 } from "./actions/agentActions";
 import { renderAgent, renderStory } from "./utils/text";
 import prompts, { PromptObject } from "prompts";
@@ -23,13 +25,22 @@ const initialStory: Story = {
   artefactGen: artefactGenerator,
   fate: createFates(seed),
   seed: seed,
-  actions: [findArtefact, useArtefact, study, politics, train, smear]
+  actions: [
+    findArtefact,
+    useArtefact,
+    study,
+    politics,
+    train,
+    smear,
+    spy,
+    assault
+  ]
 };
 
 export const bigBang = (s: Story): Story => {
   const newStoryPoint: StoryPoint = {
-    agents: [...new Array(6)].map((i) => s.agentGen(s.fate())),
-    artefacts: [...new Array(15)].map((i) => s.artefactGen(s.fate())),
+    agents: [...new Array(3)].map((i) => s.agentGen(s.fate())),
+    artefacts: [...new Array(5)].map((i) => s.artefactGen(s.fate())),
     facts: []
   };
   return { ...s, storyPoints: [[newStoryPoint, "The world was created"]] };

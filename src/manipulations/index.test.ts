@@ -11,7 +11,14 @@ import {
   train,
   smear
 } from "../actions/agentActions";
-import { changeAgentResource, killAgent, reviveAgent } from ".";
+import {
+  changeAgentResource,
+  giveArtefactToAgent,
+  killAgent,
+  removeArtefactFromAgent,
+  removeArtefactFromDiscover,
+  reviveAgent
+} from ".";
 const testSeed = 42;
 
 const generateAgent = (id: number): Agent => ({
@@ -100,4 +107,41 @@ describe("testing changeAgentResource manipulator", () => {
       )(now);
       expect(afterNegChange.agents[0].resources.knowledge).toEqual(-3);
     });
+});
+
+describe("testing removeArtefactFromAgent manipulator", () => {
+  test("using removeArtefactFromAgent should remove an artefact from agent", () => {
+    const now = generateStoryPoint();
+    expect(now.agents[0].inventory.length).toEqual(0);
+    const newArtefact = generateArtefact(16);
+    now.agents[0].inventory = [newArtefact];
+    const afterChange = removeArtefactFromAgent(
+      now.agents[0],
+      newArtefact
+    )(now);
+    expect(afterChange.agents[0].inventory.length).toEqual(0);
+  });
+});
+
+describe("testing giveArtefactToAgent manipulator", () => {
+  test("using giveArtefactToAgent should give an artefact to agent", () => {
+    const now = generateStoryPoint();
+    expect(now.agents[0].inventory.length).toEqual(0);
+    const newArtefact = generateArtefact(16);
+    const afterChange = giveArtefactToAgent(now.agents[0], newArtefact)(now);
+    expect(afterChange.agents[0].inventory.length).toEqual(1);
+    expect(afterChange.agents[0].inventory[0]).toEqual(newArtefact);
+  });
+});
+
+describe("testing removeArtefactFromDiscover manipulator", () => {
+  test("using giveArtefactToAgent should remove an artefact from discover", () => {
+    const now = generateStoryPoint();
+    expect(now.artefacts.length).toEqual(5);
+    console.log(now.artefacts);
+
+    const afterChange = removeArtefactFromDiscover(now.artefacts[1])(now);
+    console.log(afterChange.artefacts);
+    expect(afterChange.artefacts.length).toEqual(4);
+  });
 });

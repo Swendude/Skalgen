@@ -1,7 +1,13 @@
-import { changeAgentResource } from "../manipulations";
+import { pipe } from "ramda";
+import {
+  changeAgentResource,
+  giveArtefactToAgent,
+  removeArtefactFromDiscover
+} from "../manipulations";
 import { AgentAction } from "../skalgen";
 import { createFates, makeChoice } from "../utils/fates";
 import { renderAgent, renderArtefact } from "../utils/text";
+import { notMe } from "../utils/utils";
 
 export const study: AgentAction = {
   name: "study",
@@ -12,6 +18,36 @@ export const study: AgentAction = {
   ]
 };
 
+export const spy: AgentAction = {
+  name: "spy",
+  checker: (storyPoint, agent) => notMe(agent, storyPoint.agents).length > 0,
+  effect: (seed, now, agent) => {
+    const fate = createFates(seed);
+    const chosenTarget = makeChoice(fate, now.agents);
+    const [myRoll, theirRoll] = [
+      fate(10) + agent.resources.might,
+      fate(10) + agent.resources.might
+    ];
+    if (myRoll > theirRoll) {
+      return [
+        changeAgentResource(chosenTarget, "knowledge", -1)(now),
+        `${renderAgent(
+          agent
+        )} used his spies to infiltrate and reduce the knowledge of ${renderAgent(
+          chosenTarget
+        )}`
+      ];
+    } else {
+      return [
+        changeAgentResource(agent, "knowledge", -1)(now),
+        `${renderAgent(agent)} failed to spy on ${renderAgent(
+          chosenTarget
+        )} and lost knowledge`
+      ];
+    }
+  }
+};
+
 export const train: AgentAction = {
   name: "train",
   checker: (storyPoint, agent) => agent.resources.might < 3,
@@ -19,6 +55,36 @@ export const train: AgentAction = {
     changeAgentResource(agent, "might", 1)(now),
     `${renderAgent(agent)} studied the art of battle`
   ]
+};
+
+export const assault: AgentAction = {
+  name: "assault",
+  checker: (storyPoint, agent) => notMe(agent, storyPoint.agents).length > 0,
+  effect: (seed, now, agent) => {
+    const fate = createFates(seed);
+    const chosenTarget = makeChoice(fate, now.agents);
+    const [myRoll, theirRoll] = [
+      fate(10) + agent.resources.might,
+      fate(10) + agent.resources.might
+    ];
+    if (myRoll > theirRoll) {
+      return [
+        changeAgentResource(chosenTarget, "might", -1)(now),
+        `${renderAgent(
+          agent
+        )} used his armies to assault and reduce the might of ${renderAgent(
+          chosenTarget
+        )}`
+      ];
+    } else {
+      return [
+        changeAgentResource(agent, "might", -1)(now),
+        `${renderAgent(agent)} failed to assault ${renderAgent(
+          chosenTarget
+        )} and lost might`
+      ];
+    }
+  }
 };
 
 export const politics: AgentAction = {
@@ -32,8 +98,7 @@ export const politics: AgentAction = {
 
 export const smear: AgentAction = {
   name: "smear",
-  checker: (storyPoint, agent) =>
-    storyPoint.agents.filter((_agent) => _agent.id !== agent.id).length > 0,
+  checker: (storyPoint, agent) => notMe(agent, storyPoint.agents).length > 0,
   effect: (seed, now, agent) => {
     const fate = createFates(seed);
     const chosenTarget = makeChoice(fate, now.agents);
@@ -50,8 +115,10 @@ export const smear: AgentAction = {
       ];
     } else {
       return [
-        { ...now },
-        `${renderAgent(agent)} failed to smear ${renderAgent(chosenTarget)}`
+        changeAgentResource(agent, "influence", -1)(now),
+        `${renderAgent(agent)} failed to smear ${renderAgent(
+          chosenTarget
+        )} and lost influence`
       ];
     }
   }
@@ -99,22 +166,10 @@ export const findArtefact: AgentAction = {
       }
     }
     return [
-      {
-        ...now,
-        artefacts: [...now.artefacts.filter((a) => a !== artefact)],
-        agents: [
-          ...now.agents.map((_agent) => {
-            if (_agent.name === agent.name) {
-              return {
-                ...agent,
-                inventory: [{ ...artefact }, ...agent.inventory]
-              };
-            } else {
-              return _agent;
-            }
-          })
-        ]
-      },
+      pipe(
+        giveArtefactToAgent(agent, artefact),
+        removeArtefactFromDiscover(artefact)
+      )(now),
       `${renderAgent(agent)} found the artefact ${renderArtefact(artefact)}`
     ];
   }

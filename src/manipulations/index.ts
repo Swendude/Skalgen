@@ -7,7 +7,9 @@ import {
   filter,
   eqProps,
   clamp,
-  findIndex
+  not,
+  findIndex,
+  reject
 } from "ramda";
 
 // UTILS
@@ -76,17 +78,33 @@ const removeArtefactFromAgent =
     const agentIx = findIndex(eqProps("id", agent), s.agents);
     return set(
       agentArtefactsLens(agentIx),
-      filter(eqProps("id", artefact), view(agentArtefactsLens(agentIx), s)),
+      reject(eqProps("id", artefact), view(agentArtefactsLens(agentIx), s)),
       s
     );
   };
 
+const giveArtefactToAgent =
+  (agent: Agent, artefact: Artefact) => (s: StoryPoint) => {
+    const agentIx = findIndex(eqProps("id", agent), s.agents);
+    return set(
+      agentArtefactsLens(agentIx),
+      [...view(agentArtefactsLens(agentIx), s), artefact],
+      s
+    );
+  };
+
+const removeArtefactFromDiscover = (artefact: Artefact) => (s: StoryPoint) => {
+  return { ...s, artefacts: reject(eqProps("id", artefact), s.artefacts) };
+};
+
 export {
   removeArtefactFromAgent,
+  giveArtefactToAgent,
   changeAgentResource,
   reviveAgent,
   killAgent,
   includesId,
   retrieveById,
-  retrieveByName
+  retrieveByName,
+  removeArtefactFromDiscover
 };
