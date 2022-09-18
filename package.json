@@ -5,9 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "generate": "tsc && node build/index.js",
-    "start:build": "tsc -w",
-    "start:run": "nodemon build/index.js",
-    "start": "concurrently npm:start:*",
+    "start": "tsc && node build/index.js",
     "test": "jest",
     "test-watch": "jest --watch"
   },
