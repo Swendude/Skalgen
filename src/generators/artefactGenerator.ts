@@ -1,4 +1,4 @@
-import { Artefact, ResourceVal } from "../skalgen";
+import { Artefact } from "../skalgen";
 import { capitalize } from "../utils/text";
 import { createFates, makeChoice } from "../utils/fates";
 import {
@@ -51,7 +51,7 @@ const artefactGenerator = (seed: number): Artefact => {
     id: fate(),
     name: `${pfixs} ${name} ${sfix} ${icon}`,
     usage: {
-      knowledge_requirement: fate(3) as ResourceVal,
+      knowledge_requirement: fate(3),
       action: chosenAction
     }
   };

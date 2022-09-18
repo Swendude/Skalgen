@@ -1,6 +1,7 @@
 import agentGenerator from "../generators/agentGenerator";
 import { Story, Agent, StoryPoint, Artefact } from "../skalgen";
 import artefactGenerator from "../generators/artefactGenerator";
+import { pipe } from "ramda";
 import { createFates } from "../utils/fates";
 import {
   findArtefact,
@@ -10,7 +11,7 @@ import {
   train,
   smear
 } from "../actions/agentActions";
-import { killAgent } from ".";
+import { changeAgentResource, killAgent, reviveAgent } from ".";
 const testSeed = 42;
 
 const generateAgent = (id: number): Agent => ({
@@ -55,16 +56,48 @@ describe("testing killAgent manipulator", () => {
   }),
     test("using killAgent should kill an agent", () => {
       const now = generateStoryPoint();
-      const after = killAgent(now.agents[0], now);
+
+      const after = killAgent(now.agents[0])(now);
       expect(after.agents.filter((agent) => !agent.dead).length).toEqual(2);
     });
 });
 
-// const initialStory: Story = {
-//   storyPoints: [[generateStoryPoint(), "first"]],
-//   agentGen: agentGenerator,
-//   artefactGen: artefactGenerator,
-//   fate: createFates(testSeed),
-//   seed: testSeed,
-//   actions: [findArtefact, useArtefact, study, politics, train, smear]
-// };
+describe("testing reviveAgent manipulator", () => {
+  test("using reviveAgent should revive an agent", () => {
+    const now = generateStoryPoint();
+
+    const afterKill = killAgent(now.agents[0])(now);
+    expect(
+      afterKill.agents.filter((agent: Agent) => !agent.dead).length
+    ).toEqual(2);
+
+    const afterRev = reviveAgent(afterKill.agents[0])(now);
+    expect(afterRev.agents.filter((agent) => !agent.dead).length).toEqual(3);
+  });
+});
+
+describe("testing changeAgentResource manipulator", () => {
+  test("using changeAgentResource should change an agent resource", () => {
+    const now = generateStoryPoint();
+    expect(now.agents[0].resources.knowledge).toEqual(0);
+
+    const afterChange = changeAgentResource(now.agents[0], "knowledge", 1)(now);
+    expect(afterChange.agents[0].resources.knowledge).toEqual(1);
+  }),
+    test("using changeAgentResource should never change an agent resource above 3", () => {
+      const now = generateStoryPoint();
+      expect(now.agents[0].resources.knowledge).toEqual(0);
+
+      const afterPosChange = pipe(
+        changeAgentResource(now.agents[0], "knowledge", 2),
+        changeAgentResource(now.agents[0], "knowledge", 8)
+      )(now);
+      expect(afterPosChange.agents[0].resources.knowledge).toEqual(3);
+
+      const afterNegChange = pipe(
+        changeAgentResource(now.agents[0], "knowledge", -1),
+        changeAgentResource(now.agents[0], "knowledge", -52)
+      )(now);
+      expect(afterNegChange.agents[0].resources.knowledge).toEqual(-3);
+    });
+});

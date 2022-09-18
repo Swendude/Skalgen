@@ -1,5 +1,5 @@
 import { changeAgentResource } from "../manipulations";
-import { AgentAction, ResourceVal } from "../skalgen";
+import { AgentAction } from "../skalgen";
 import { createFates, makeChoice } from "../utils/fates";
 import { renderAgent, renderArtefact } from "../utils/text";
 
@@ -7,7 +7,7 @@ export const study: AgentAction = {
   name: "study",
   checker: (storyPoint, agent) => agent.resources.knowledge < 3,
   effect: (seed, now, agent) => [
-    changeAgentResource(agent, "knowledge", 1, now),
+    changeAgentResource(agent, "knowledge", 1)(now),
     `${renderAgent(agent)} delved into ancient tomes to discover knowledge`
   ]
 };
@@ -16,7 +16,7 @@ export const train: AgentAction = {
   name: "train",
   checker: (storyPoint, agent) => agent.resources.might < 3,
   effect: (seed, now, agent) => [
-    changeAgentResource(agent, "might", 1, now),
+    changeAgentResource(agent, "might", 1)(now),
     `${renderAgent(agent)} studied the art of battle`
   ]
 };
@@ -25,7 +25,7 @@ export const politics: AgentAction = {
   name: "politics",
   checker: (storyPoint, agent) => agent.resources.influence < 3,
   effect: (seed, now, agent) => [
-    changeAgentResource(agent, "influence", 1, now),
+    changeAgentResource(agent, "influence", 1)(now),
     `${renderAgent(agent)} convinced the population of their achievements`
   ]
 };
@@ -43,7 +43,7 @@ export const smear: AgentAction = {
     ];
     if (myRoll > theirRoll) {
       return [
-        changeAgentResource(chosenTarget, "influence", -1, now),
+        changeAgentResource(chosenTarget, "influence", -1)(now),
         `${renderAgent(agent)} reduced the influence of ${renderAgent(
           chosenTarget
         )}`

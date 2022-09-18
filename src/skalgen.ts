@@ -17,17 +17,16 @@ export type StoryPoint = {
   facts: string[];
 };
 
-type attitudeVal = -3 | -2 | -1 | 0 | 1 | 2 | 3;
-export type ResourceVal = 0 | 1 | 2;
-export type ResourceT = "knowledge" | "influence" | "might";
+export type ResourceK = "knowledge" | "influence" | "might";
+
+export type Resources = { [key in ResourceK]: number };
 
 export type Agent = {
   id: number;
   name: string;
   inventory: Artefact[];
   dead: boolean;
-  //   attitudes: { [key: string]: attitudeVal };
-  resources: { [key in ResourceT]: ResourceVal };
+  resources: Resources;
 };
 
 export type Artefact = {
@@ -37,7 +36,7 @@ export type Artefact = {
 };
 
 type Usage = {
-  knowledge_requirement: ResourceVal;
+  knowledge_requirement: number;
   action: ArtefactAction;
 };
 

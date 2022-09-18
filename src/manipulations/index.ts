@@ -1,11 +1,16 @@
+import { Artefact, StoryPoint, Agent, ResourceK, Resources } from "../skalgen";
 import {
-  Artefact,
-  StoryPoint,
-  Agent,
-  ResourceVal,
-  ResourceT
-} from "../skalgen";
-import { lens, prop, assoc, lensProp, lensPath } from "ramda";
+  lensPath,
+  set,
+  indexOf,
+  view,
+  filter,
+  eqProps,
+  clamp,
+  findIndex
+} from "ramda";
+
+// UTILS
 
 const includesId = <T extends { id: number }>(
   itemId: number,
@@ -28,71 +33,55 @@ const retrieveByName = <T extends { name: string }>(
   return items.find((_item) => _item.name === itemName);
 };
 
-const killAgent = (agent: Agent, s: StoryPoint) => ({
-  ...s,
-  agents: s.agents.map((_agent) => {
-    if (agent.id === _agent.id) {
-      return { ...agent, dead: true };
-    } else return _agent;
-  })
-});
+// LENSES 🔎
 
-const reviveAgent = (agent: Agent, s: StoryPoint) => ({
-  ...s,
-  agents: s.agents.map((_agent) => {
-    if (agent.id === _agent.id) {
-      return { ...agent, dead: false };
-    } else return _agent;
-  })
-});
+const agentDeadLens = (ix: number) =>
+  lensPath<StoryPoint, boolean>(["agents", ix, "dead"]);
 
-const changeAgentResource = (
-  agent: Agent,
-  resource: ResourceT,
-  change: number,
-  s: StoryPoint
-) => {
-  return {
-    ...s,
-    agents: s.agents.map((_agent) => {
-      const newResourceVal = _agent.resources[resource] + change;
-      if (_agent.id === agent.id) {
-        return {
-          ..._agent,
-          resources: {
-            ..._agent.resources,
-            [resource]:
-              newResourceVal < 0 ? 0 : newResourceVal > 3 ? 3 : newResourceVal
-          }
-        };
-      } else {
-        return _agent;
-      }
-    })
-  } as StoryPoint;
+const agentResourceLens = (ix: number, key: keyof Resources) =>
+  lensPath<StoryPoint, number>(["agents", ix, "resources", key]);
+
+const agentArtefactsLens = (agentIx: number) =>
+  lensPath<StoryPoint, Artefact[]>(["agents", agentIx, "inventory"]);
+
+// MANIPULATORS
+
+const killAgent = (agent: Agent) => (s: StoryPoint) => {
+  const agentIx = findIndex(eqProps("id", agent), s.agents);
+
+  return set(agentDeadLens(agentIx), true, s);
 };
 
-const removeArtefactFromAgent = (
-  agent: Agent,
-  artefact: Artefact,
-  s: StoryPoint
-) => {
-  return {
-    ...s,
-    agents: s.agents.map((_agent) => {
-      if (_agent.id === agent.id) {
-        return {
-          ..._agent,
-          inventory: _agent.inventory.filter(
-            (_artefact) => _artefact.id !== artefact.id
-          )
-        };
-      } else {
-        return _agent;
-      }
-    })
+const reviveAgent = (agent: Agent) => (s: StoryPoint) => {
+  const agentIx = findIndex(eqProps("id", agent), s.agents);
+
+  return set(agentDeadLens(agentIx), false, s);
+};
+
+const changeAgentResource =
+  (agent: Agent, resource: ResourceK, change: number) => (s: StoryPoint) => {
+    const agentIx = findIndex(eqProps("id", agent), s.agents);
+
+    const result = set(
+      agentResourceLens(agentIx, resource),
+      clamp(-3, 3, view(agentResourceLens(agentIx, resource), s) + change),
+      s
+    );
+
+    return result;
   };
-};
+
+const removeArtefactFromAgent =
+  (agent: Agent, artefact: Artefact) => (s: StoryPoint) => {
+    const agentIx = findIndex(eqProps("id", agent), s.agents);
+    console.log(agentIx);
+    console.log(view(agentArtefactsLens(agentIx), s));
+    return set(
+      agentArtefactsLens(agentIx),
+      filter(eqProps("id", artefact), view(agentArtefactsLens(agentIx), s)),
+      s
+    );
+  };
 
 export {
   removeArtefactFromAgent,

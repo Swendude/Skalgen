@@ -8,7 +8,7 @@ exports.study = {
     name: "study",
     checker: (storyPoint, agent) => agent.resources.knowledge < 3,
     effect: (seed, now, agent) => [
-        (0, manipulations_1.changeAgentResource)(agent, "knowledge", 1, now),
+        (0, manipulations_1.changeAgentResource)(agent, "knowledge", 1)(now),
         `${(0, text_1.renderAgent)(agent)} delved into ancient tomes to discover knowledge`
     ]
 };
@@ -16,7 +16,7 @@ exports.train = {
     name: "train",
     checker: (storyPoint, agent) => agent.resources.might < 3,
     effect: (seed, now, agent) => [
-        (0, manipulations_1.changeAgentResource)(agent, "might", 1, now),
+        (0, manipulations_1.changeAgentResource)(agent, "might", 1)(now),
         `${(0, text_1.renderAgent)(agent)} studied the art of battle`
     ]
 };
@@ -24,7 +24,7 @@ exports.politics = {
     name: "politics",
     checker: (storyPoint, agent) => agent.resources.influence < 3,
     effect: (seed, now, agent) => [
-        (0, manipulations_1.changeAgentResource)(agent, "influence", 1, now),
+        (0, manipulations_1.changeAgentResource)(agent, "influence", 1)(now),
         `${(0, text_1.renderAgent)(agent)} convinced the population of their achievements`
     ]
 };
@@ -40,7 +40,7 @@ exports.smear = {
         ];
         if (myRoll > theirRoll) {
             return [
-                (0, manipulations_1.changeAgentResource)(chosenTarget, "influence", -1, now),
+                (0, manipulations_1.changeAgentResource)(chosenTarget, "influence", -1)(now),
                 `${(0, text_1.renderAgent)(agent)} reduced the influence of ${(0, text_1.renderAgent)(chosenTarget)}`
             ];
         }

@@ -7,6 +7,7 @@ import {
   removeArtefactFromAgent,
   reviveAgent
 } from "../manipulations";
+import { pipe } from "ramda";
 
 export const killOtherAgent: ArtefactAction = {
   name: "kill_other_agent",
@@ -25,7 +26,7 @@ export const killOtherAgent: ArtefactAction = {
 
     if (theirRoll > myRoll) {
       return [
-        removeArtefactFromAgent(agent, artefact, now),
+        removeArtefactFromAgent(agent, artefact)(now),
         `${renderAgent(
           agent
         )} failed to kill (${myRoll}-${theirRoll}) ${renderAgent(
@@ -34,7 +35,10 @@ export const killOtherAgent: ArtefactAction = {
       ];
     }
     return [
-      removeArtefactFromAgent(agent, artefact, killAgent(chosenTarget, now)),
+      pipe(
+        killAgent(chosenTarget),
+        removeArtefactFromAgent(agent, artefact)
+      )(now),
       `${renderAgent(agent)} killed ${renderAgent(
         chosenTarget
       )} using ${renderArtefact(artefact)}!`
@@ -50,18 +54,17 @@ export const gainMight: ArtefactAction = {
     const fate = createFates(seed);
     if (fate(10) < 6) {
       return [
-        removeArtefactFromAgent(agent, artefact, now),
+        removeArtefactFromAgent(agent, artefact)(now),
         `${renderAgent(agent)} tried to gain might by using ${renderArtefact(
           artefact
         )} but failed and destroyed the item`
       ];
     }
     return [
-      removeArtefactFromAgent(
-        agent,
-        artefact,
-        changeAgentResource(agent, "might", 1, now)
-      ),
+      pipe(
+        changeAgentResource(agent, "might", 1),
+        removeArtefactFromAgent(agent, artefact)
+      )(now),
       `${renderAgent(agent)} gained might using ${renderArtefact(artefact)}!`
     ];
   }
@@ -82,7 +85,10 @@ export const reviveOtherAgent: ArtefactAction = {
     );
 
     return [
-      removeArtefactFromAgent(agent, artefact, reviveAgent(chosenTarget, now)),
+      pipe(
+        reviveAgent(chosenTarget),
+        removeArtefactFromAgent(agent, artefact)
+      )(now),
       `${renderAgent(agent)} revived ${renderAgent(chosenTarget)} using ${
         artefact.name
       }!`
