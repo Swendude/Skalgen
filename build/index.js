@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.tick = exports.bigBang = void 0;
 const agentGenerator_1 = __importDefault(require("./generators/agentGenerator"));
 const artefactGenerator_1 = __importDefault(require("./generators/artefactGenerator"));
 const fates_1 = require("./utils/fates");
@@ -10,6 +11,7 @@ const agentActions_1 = require("./actions/agentActions");
 const text_1 = require("./utils/text");
 const prompts_1 = __importDefault(require("prompts"));
 const kleur_1 = __importDefault(require("kleur"));
+const manipulations_1 = require("./manipulations");
 const seed = parseInt(process.argv[2]) || Math.floor(Math.random() * 1000000);
 const initialStory = {
     storyPoints: [],
@@ -27,7 +29,8 @@ const bigBang = (s) => {
     };
     return Object.assign(Object.assign({}, s), { storyPoints: [[newStoryPoint, "The world was created"]] });
 };
-const tick = (s) => {
+exports.bigBang = bigBang;
+const tick = (s, agentId, actionName) => {
     const [currentPoint, currentLog] = s.storyPoints[s.storyPoints.length - 1];
     // pick an agent
     const agentsAlive = currentPoint.agents.filter((agent) => !agent.dead);
@@ -38,8 +41,13 @@ const tick = (s) => {
             ] });
     }
     const currentAgentIndex = (s.storyPoints.length - 1) % agentsAlive.length;
-    const chosenAgent = agentsAlive[currentAgentIndex];
+    const chosenAgent = agentId
+        ? (0, manipulations_1.retrieveById)(agentId, agentsAlive)
+        : agentsAlive[currentAgentIndex];
     // const chosenAgent = makeChoice(s.fate, agentsAlive);
+    if (!chosenAgent) {
+        throw `This agent is not alive! (id:${agentId})`;
+    }
     // pick an action
     const availableActions = s.actions.filter((_action) => _action.checker(currentPoint, chosenAgent));
     if (availableActions.length === 0) {
@@ -48,13 +56,19 @@ const tick = (s) => {
                 [currentPoint, `${(0, text_1.renderAgent)(chosenAgent)} could not take any action`]
             ] });
     }
-    const chosenAction = (0, fates_1.makeChoice)(s.fate, availableActions);
+    const chosenAction = actionName
+        ? (0, manipulations_1.retrieveByName)(actionName, availableActions)
+        : (0, fates_1.makeChoice)(s.fate, availableActions);
+    if (!chosenAction) {
+        throw `This action is not available for this agent!(id:${agentId}, name:${actionName})`;
+    }
     return Object.assign(Object.assign({}, s), { storyPoints: [
             ...s.storyPoints,
             chosenAction.effect(s.fate(), currentPoint, chosenAgent)
         ] });
 };
-let currentStory = bigBang(initialStory);
+exports.tick = tick;
+let currentStory = (0, exports.bigBang)(initialStory);
 const run_cli = async () => {
     let exited = false;
     let last_message = `Waiting for input`;
@@ -87,7 +101,7 @@ const run_cli = async () => {
                 break;
             case "next":
                 last_message = "Tick returned";
-                currentStory = tick(currentStory);
+                currentStory = (0, exports.tick)(currentStory);
                 break;
             case "log": {
                 currentStory.storyPoints.forEach((sp, i) => {

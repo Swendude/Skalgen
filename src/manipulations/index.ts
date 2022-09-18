@@ -5,8 +5,30 @@ import {
   ResourceVal,
   ResourceT
 } from "../skalgen";
+import { lens, prop, assoc, lensProp, lensPath } from "ramda";
 
-export const killAgent = (s: StoryPoint, agent: Agent) => ({
+const includesId = <T extends { id: number }>(
+  itemId: number,
+  items: T[]
+): Boolean => {
+  return items.filter((_item) => _item.id === itemId).length > 0;
+};
+
+const retrieveById = <T extends { id: number }>(
+  itemId: number,
+  items: T[]
+): T | undefined => {
+  return items.find((_item) => _item.id === itemId);
+};
+
+const retrieveByName = <T extends { name: string }>(
+  itemName: string,
+  items: T[]
+): T | undefined => {
+  return items.find((_item) => _item.name === itemName);
+};
+
+const killAgent = (agent: Agent, s: StoryPoint) => ({
   ...s,
   agents: s.agents.map((_agent) => {
     if (agent.id === _agent.id) {
@@ -15,7 +37,7 @@ export const killAgent = (s: StoryPoint, agent: Agent) => ({
   })
 });
 
-export const reviveAgent = (s: StoryPoint, agent: Agent) => ({
+const reviveAgent = (agent: Agent, s: StoryPoint) => ({
   ...s,
   agents: s.agents.map((_agent) => {
     if (agent.id === _agent.id) {
@@ -24,11 +46,11 @@ export const reviveAgent = (s: StoryPoint, agent: Agent) => ({
   })
 });
 
-export const changeAgentResource = (
-  s: StoryPoint,
+const changeAgentResource = (
   agent: Agent,
   resource: ResourceT,
-  change: number
+  change: number,
+  s: StoryPoint
 ) => {
   return {
     ...s,
@@ -50,10 +72,10 @@ export const changeAgentResource = (
   } as StoryPoint;
 };
 
-export const removeArtefactFromAgent = (
-  s: StoryPoint,
+const removeArtefactFromAgent = (
   agent: Agent,
-  artefact: Artefact
+  artefact: Artefact,
+  s: StoryPoint
 ) => {
   return {
     ...s,
@@ -70,4 +92,14 @@ export const removeArtefactFromAgent = (
       }
     })
   };
+};
+
+export {
+  removeArtefactFromAgent,
+  changeAgentResource,
+  reviveAgent,
+  killAgent,
+  includesId,
+  retrieveById,
+  retrieveByName
 };

@@ -25,7 +25,7 @@ export const killOtherAgent: ArtefactAction = {
 
     if (theirRoll > myRoll) {
       return [
-        removeArtefactFromAgent(now, agent, artefact),
+        removeArtefactFromAgent(agent, artefact, now),
         `${renderAgent(
           agent
         )} failed to kill (${myRoll}-${theirRoll}) ${renderAgent(
@@ -34,7 +34,7 @@ export const killOtherAgent: ArtefactAction = {
       ];
     }
     return [
-      removeArtefactFromAgent(killAgent(now, chosenTarget), agent, artefact),
+      removeArtefactFromAgent(agent, artefact, killAgent(chosenTarget, now)),
       `${renderAgent(agent)} killed ${renderAgent(
         chosenTarget
       )} using ${renderArtefact(artefact)}!`
@@ -50,7 +50,7 @@ export const gainMight: ArtefactAction = {
     const fate = createFates(seed);
     if (fate(10) < 6) {
       return [
-        removeArtefactFromAgent(now, agent, artefact),
+        removeArtefactFromAgent(agent, artefact, now),
         `${renderAgent(agent)} tried to gain might by using ${renderArtefact(
           artefact
         )} but failed and destroyed the item`
@@ -58,9 +58,9 @@ export const gainMight: ArtefactAction = {
     }
     return [
       removeArtefactFromAgent(
-        changeAgentResource(now, agent, "might", 1),
         agent,
-        artefact
+        artefact,
+        changeAgentResource(agent, "might", 1, now)
       ),
       `${renderAgent(agent)} gained might using ${renderArtefact(artefact)}!`
     ];
@@ -82,7 +82,7 @@ export const reviveOtherAgent: ArtefactAction = {
     );
 
     return [
-      removeArtefactFromAgent(reviveAgent(now, chosenTarget), agent, artefact),
+      removeArtefactFromAgent(agent, artefact, reviveAgent(chosenTarget, now)),
       `${renderAgent(agent)} revived ${renderAgent(chosenTarget)} using ${
         artefact.name
       }!`

@@ -1,7 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeArtefactFromAgent = exports.changeAgentResource = exports.reviveAgent = exports.killAgent = void 0;
-const killAgent = (s, agent) => (Object.assign(Object.assign({}, s), { agents: s.agents.map((_agent) => {
+exports.retrieveByName = exports.retrieveById = exports.includesId = exports.killAgent = exports.reviveAgent = exports.changeAgentResource = exports.removeArtefactFromAgent = void 0;
+const includesId = (itemId, items) => {
+    return items.filter((_item) => _item.id === itemId).length > 0;
+};
+exports.includesId = includesId;
+const retrieveById = (itemId, items) => {
+    return items.find((_item) => _item.id === itemId);
+};
+exports.retrieveById = retrieveById;
+const retrieveByName = (itemName, items) => {
+    return items.find((_item) => _item.name === itemName);
+};
+exports.retrieveByName = retrieveByName;
+const killAgent = (agent, s) => (Object.assign(Object.assign({}, s), { agents: s.agents.map((_agent) => {
         if (agent.id === _agent.id) {
             return Object.assign(Object.assign({}, agent), { dead: true });
         }
@@ -9,7 +21,7 @@ const killAgent = (s, agent) => (Object.assign(Object.assign({}, s), { agents: s
             return _agent;
     }) }));
 exports.killAgent = killAgent;
-const reviveAgent = (s, agent) => (Object.assign(Object.assign({}, s), { agents: s.agents.map((_agent) => {
+const reviveAgent = (agent, s) => (Object.assign(Object.assign({}, s), { agents: s.agents.map((_agent) => {
         if (agent.id === _agent.id) {
             return Object.assign(Object.assign({}, agent), { dead: false });
         }
@@ -17,7 +29,7 @@ const reviveAgent = (s, agent) => (Object.assign(Object.assign({}, s), { agents:
             return _agent;
     }) }));
 exports.reviveAgent = reviveAgent;
-const changeAgentResource = (s, agent, resource, change) => {
+const changeAgentResource = (agent, resource, change, s) => {
     return Object.assign(Object.assign({}, s), { agents: s.agents.map((_agent) => {
             const newResourceVal = _agent.resources[resource] + change;
             if (_agent.id === agent.id) {
@@ -29,7 +41,7 @@ const changeAgentResource = (s, agent, resource, change) => {
         }) });
 };
 exports.changeAgentResource = changeAgentResource;
-const removeArtefactFromAgent = (s, agent, artefact) => {
+const removeArtefactFromAgent = (agent, artefact, s) => {
     return Object.assign(Object.assign({}, s), { agents: s.agents.map((_agent) => {
             if (_agent.id === agent.id) {
                 return Object.assign(Object.assign({}, _agent), { inventory: _agent.inventory.filter((_artefact) => _artefact.id !== artefact.id) });

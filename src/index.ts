@@ -13,6 +13,8 @@ import {
 import { renderAgent, renderStory } from "./utils/text";
 import prompts, { PromptObject } from "prompts";
 import kleur from "kleur";
+import { includesId, retrieveById, retrieveByName } from "./manipulations";
+import { rawListeners } from "process";
 
 const seed = parseInt(process.argv[2]) || Math.floor(Math.random() * 1000000);
 const initialStory: Story = {
@@ -24,7 +26,7 @@ const initialStory: Story = {
   actions: [findArtefact, useArtefact, study, politics, train, smear]
 };
 
-const bigBang = (s: Story): Story => {
+export const bigBang = (s: Story): Story => {
   const newStoryPoint: StoryPoint = {
     agents: [...new Array(6)].map((i) => s.agentGen(s.fate())),
     artefacts: [...new Array(15)].map((i) => s.artefactGen(s.fate())),
@@ -33,7 +35,11 @@ const bigBang = (s: Story): Story => {
   return { ...s, storyPoints: [[newStoryPoint, "The world was created"]] };
 };
 
-const tick = (s: Story): Story => {
+export const tick = (
+  s: Story,
+  agentId?: number,
+  actionName?: string
+): Story => {
   const [currentPoint, currentLog] = s.storyPoints[s.storyPoints.length - 1];
   // pick an agent
 
@@ -48,8 +54,15 @@ const tick = (s: Story): Story => {
     };
   }
   const currentAgentIndex = (s.storyPoints.length - 1) % agentsAlive.length;
-  const chosenAgent = agentsAlive[currentAgentIndex];
+
+  const chosenAgent = agentId
+    ? retrieveById(agentId, agentsAlive)
+    : agentsAlive[currentAgentIndex];
   // const chosenAgent = makeChoice(s.fate, agentsAlive);
+
+  if (!chosenAgent) {
+    throw `This agent is not alive! (id:${agentId})`;
+  }
 
   // pick an action
   const availableActions = s.actions.filter((_action) =>
@@ -64,7 +77,15 @@ const tick = (s: Story): Story => {
       ]
     };
   }
-  const chosenAction = makeChoice(s.fate, availableActions);
+
+  const chosenAction = actionName
+    ? retrieveByName(actionName, availableActions)
+    : makeChoice(s.fate, availableActions);
+
+  if (!chosenAction) {
+    throw `This action is not available for this agent!(id:${agentId}, name:${actionName})`;
+  }
+
   return {
     ...s,
     storyPoints: [

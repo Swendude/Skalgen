@@ -7,7 +7,7 @@ export const study: AgentAction = {
   name: "study",
   checker: (storyPoint, agent) => agent.resources.knowledge < 3,
   effect: (seed, now, agent) => [
-    changeAgentResource(now, agent, "knowledge", 1),
+    changeAgentResource(agent, "knowledge", 1, now),
     `${renderAgent(agent)} delved into ancient tomes to discover knowledge`
   ]
 };
@@ -16,7 +16,7 @@ export const train: AgentAction = {
   name: "train",
   checker: (storyPoint, agent) => agent.resources.might < 3,
   effect: (seed, now, agent) => [
-    changeAgentResource(now, agent, "might", 1),
+    changeAgentResource(agent, "might", 1, now),
     `${renderAgent(agent)} studied the art of battle`
   ]
 };
@@ -25,7 +25,7 @@ export const politics: AgentAction = {
   name: "politics",
   checker: (storyPoint, agent) => agent.resources.influence < 3,
   effect: (seed, now, agent) => [
-    changeAgentResource(now, agent, "influence", 1),
+    changeAgentResource(agent, "influence", 1, now),
     `${renderAgent(agent)} convinced the population of their achievements`
   ]
 };
@@ -43,7 +43,7 @@ export const smear: AgentAction = {
     ];
     if (myRoll > theirRoll) {
       return [
-        changeAgentResource(now, chosenTarget, "influence", -1),
+        changeAgentResource(chosenTarget, "influence", -1, now),
         `${renderAgent(agent)} reduced the influence of ${renderAgent(
           chosenTarget
         )}`
