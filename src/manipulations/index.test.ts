@@ -1,16 +1,6 @@
-import agentGenerator from "../generators/agentGenerator";
-import { Story, Agent, StoryPoint, Artefact } from "../skalgen";
-import artefactGenerator from "../generators/artefactGenerator";
+import { Agent, StoryPoint, Artefact } from "../skalgen";
 import { pipe } from "ramda";
-import { createFates } from "../utils/fates";
-import {
-  findArtefact,
-  useArtefact,
-  study,
-  politics,
-  train,
-  smear
-} from "../actions/agentActions";
+
 import {
   changeAgentResource,
   giveArtefactToAgent,
@@ -19,7 +9,6 @@ import {
   removeArtefactFromDiscover,
   reviveAgent
 } from ".";
-const testSeed = 42;
 
 const generateAgent = (id: number): Agent => ({
   id: id,
@@ -138,10 +127,9 @@ describe("testing removeArtefactFromDiscover manipulator", () => {
   test("using giveArtefactToAgent should remove an artefact from discover", () => {
     const now = generateStoryPoint();
     expect(now.artefacts.length).toEqual(5);
-    console.log(now.artefacts);
 
     const afterChange = removeArtefactFromDiscover(now.artefacts[1])(now);
-    console.log(afterChange.artefacts);
+
     expect(afterChange.artefacts.length).toEqual(4);
   });
 });
