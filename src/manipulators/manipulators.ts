@@ -1,16 +1,5 @@
 import { Artefact, StoryPoint, Agent, ResourceK, Resources } from "../skalgen";
-import {
-  lensPath,
-  set,
-  indexOf,
-  view,
-  filter,
-  eqProps,
-  clamp,
-  not,
-  findIndex,
-  reject
-} from "ramda";
+import { lensPath, set, view, eqProps, clamp, findIndex, reject } from "ramda";
 
 // UTILS
 
@@ -48,19 +37,21 @@ const agentArtefactsLens = (agentIx: number) =>
 
 // MANIPULATORS
 
-const killAgent = (agent: Agent) => (s: StoryPoint) => {
+type Manipulator = (...args: any[]) => (s: StoryPoint) => StoryPoint;
+
+const killAgent: Manipulator = (agent: Agent) => (s: StoryPoint) => {
   const agentIx = findIndex(eqProps("id", agent), s.agents);
 
   return set(agentDeadLens(agentIx), true, s);
 };
 
-const reviveAgent = (agent: Agent) => (s: StoryPoint) => {
+const reviveAgent: Manipulator = (agent: Agent) => (s: StoryPoint) => {
   const agentIx = findIndex(eqProps("id", agent), s.agents);
 
   return set(agentDeadLens(agentIx), false, s);
 };
 
-const changeAgentResource =
+const changeAgentResource: Manipulator =
   (agent: Agent, resource: ResourceK, change: number) => (s: StoryPoint) => {
     const agentIx = findIndex(eqProps("id", agent), s.agents);
 
@@ -73,7 +64,7 @@ const changeAgentResource =
     return result;
   };
 
-const removeArtefactFromAgent =
+const removeArtefactFromAgent: Manipulator =
   (agent: Agent, artefact: Artefact) => (s: StoryPoint) => {
     const agentIx = findIndex(eqProps("id", agent), s.agents);
     return set(
@@ -83,7 +74,7 @@ const removeArtefactFromAgent =
     );
   };
 
-const giveArtefactToAgent =
+const giveArtefactToAgent: Manipulator =
   (agent: Agent, artefact: Artefact) => (s: StoryPoint) => {
     const agentIx = findIndex(eqProps("id", agent), s.agents);
     return set(
@@ -93,9 +84,10 @@ const giveArtefactToAgent =
     );
   };
 
-const removeArtefactFromDiscover = (artefact: Artefact) => (s: StoryPoint) => {
-  return { ...s, artefacts: reject(eqProps("id", artefact), s.artefacts) };
-};
+const removeArtefactFromDiscover: Manipulator =
+  (artefact: Artefact) => (s: StoryPoint) => {
+    return { ...s, artefacts: reject(eqProps("id", artefact), s.artefacts) };
+  };
 
 export {
   removeArtefactFromAgent,

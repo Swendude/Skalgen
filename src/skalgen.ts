@@ -1,3 +1,4 @@
+import { Modifier } from "./manipulators/modifiers";
 import { Fate } from "./utils/fates";
 
 type generator<T> = (seed: number) => T;
@@ -23,10 +24,13 @@ export type Resources = { [key in ResourceK]: number };
 
 export type Agent = {
   id: number;
-  name: string;
+  first_name: string;
+  surname: string;
+  title: string | null;
   inventory: Artefact[];
   dead: boolean;
   resources: Resources;
+  modifier: string | null;
 };
 
 export type Artefact = {

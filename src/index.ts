@@ -15,8 +15,11 @@ import {
 import { renderAgent, renderStory } from "./utils/text";
 import prompts, { PromptObject } from "prompts";
 import kleur from "kleur";
-import { includesId, retrieveById, retrieveByName } from "./manipulations";
-import { rawListeners } from "process";
+import {
+  includesId,
+  retrieveById,
+  retrieveByName
+} from "./manipulators/manipulators";
 
 const seed = parseInt(process.argv[2]) || Math.floor(Math.random() * 1000000);
 const initialStory: Story = {

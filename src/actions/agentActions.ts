@@ -3,7 +3,7 @@ import {
   changeAgentResource,
   giveArtefactToAgent,
   removeArtefactFromDiscover
-} from "../manipulations";
+} from "../manipulators/manipulators";
 import { AgentAction } from "../skalgen";
 import { createFates, makeChoice } from "../utils/fates";
 import { renderAgent, renderArtefact } from "../utils/text";

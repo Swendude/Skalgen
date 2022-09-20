@@ -42,4 +42,10 @@ export const renderArtefact = (artefact: Artefact): string =>
   })`;
 
 export const renderAgent = (agent: Agent): string =>
-  `${kleur.green().bold(agent.name)} ${agent.dead ? "☠️" : ""}`;
+  `${kleur
+    .green()
+    .bold(
+      `${agent.first_name} ${agent.surname}${
+        agent.title ? `the ${agent.title}` : ``
+      }`
+    )} ${agent.dead ? "☠️" : ""}`;

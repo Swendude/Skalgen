@@ -8,18 +8,21 @@ import {
   removeArtefactFromAgent,
   removeArtefactFromDiscover,
   reviveAgent
-} from ".";
+} from "./manipulators";
 
 const generateAgent = (id: number): Agent => ({
   id: id,
-  name: `Agent ${id}`,
+  first_name: `Agent ${id}`,
+  surname: ``,
+  title: null,
   inventory: [],
   dead: false,
   resources: {
     might: 0,
     knowledge: 0,
     influence: 0
-  }
+  },
+  modifier: null
 });
 
 const generateArtefact = (id: number): Artefact => ({

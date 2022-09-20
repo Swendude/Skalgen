@@ -6,7 +6,7 @@ import {
   killAgent,
   removeArtefactFromAgent,
   reviveAgent
-} from "../manipulations";
+} from "../manipulators/manipulators";
 import { pipe } from "ramda";
 
 export const killOtherAgent: ArtefactAction = {
